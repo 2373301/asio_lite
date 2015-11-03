@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="io_operation.h" />
+    <ClInclude Include="binder.h" />
+    <ClInclude Include="timer_queue.h" />
+    <ClInclude Include="deadline_timer.h" />
+    <ClInclude Include="op_queue.h" />
+    <ClInclude Include="handler_alloc.h" />
+    <ClInclude Include="socket.h" />
+    <ClInclude Include="iocp_io_operation.h" />
+    <ClInclude Include="iocp_io_service.h" />
+    <ClInclude Include="io_service.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="timer_queue.cpp" />
+    <ClCompile Include="deadline_timer.cpp" />
+    <ClCompile Include="socket.cpp" />
+    <ClCompile Include="iocp_io_service.cpp" />
+  </ItemGroup>
+</Project>
