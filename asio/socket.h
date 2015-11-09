@@ -27,7 +27,24 @@ public:
 	template<typename Handle>
 	void async_accept(socket& new_socket, Handle h)
 	{
-		io_service_.async_accept(*this, new_socket, h);
+		//io_service_.async_accept(*this, new_socket, h);
+        typedef io_operation_accept<Handle> op;
+        io_operation_accept<Handle>::ptr p;
+        p.v = asio_handler_alloc(sizeof(op), &h);
+        p.p = new (p.v) op(new_socket, h);
+
+        socket& acceptor = *this;
+        io_service_.work_started();
+        DWORD bytes_read = 0;
+        accept_ex_fn accept_ex = io_service::get_accept_ex(acceptor);
+        BOOL result = accept_ex(acceptor.socket_, new_socket.socket_, p.p->output_buffer_,
+            0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, &bytes_read, p.p);
+        DWORD last_error = ::WSAGetLastError();
+        if (!result && last_error != WSA_IO_PENDING)
+            io_service_.on_completion(p.p, last_error, 0);
+        else
+            io_service_.on_pending(p.p);
+        p.v = p.p = NULL;
 	}
 
 	template<typename Handle>
@@ -42,27 +59,91 @@ public:
 		if (saddri.sin_addr.s_addr == INADDR_NONE)
 		{
 			LPHOSTENT host = ::gethostbyname(ipaddr);
-			if (host == NULL)
-			{
-				io_service_.async_connect(*this, 0, 0, h);
-				return;
-			}
+// 			if (host == NULL)
+// 			{
+// 				async_connect(*this, 0, 0, h);
+// 				return;
+// 			}
 			saddri.sin_addr.s_addr = ((LPIN_ADDR)host->h_addr)->s_addr;		
 		}
 		memcpy(&remote_addr_, &saddri, sizeof(sockaddr_in));
-		io_service_.async_connect(*this, (sockaddr*)&remote_addr_, sizeof(sockaddr_in), h);
+		//io_service_.async_connect(*this, (sockaddr*)&remote_addr_, sizeof(sockaddr_in), h);
+
+        {   
+            socket& s = *this;
+            sockaddr* addr = (sockaddr*)&remote_addr_;
+            unsigned int addrlen = sizeof(sockaddr_in);
+
+            typedef io_operation1<Handle> op;
+            io_operation1<Handle>::ptr p;
+            p.v = asio_handler_alloc(sizeof(op), &h);
+            p.p = new (p.v) op(h);
+
+            io_service_.work_started();
+
+            if (addr == 0)
+            {
+                io_service_.on_completion(p.p, -1, 0);
+                p.v = p.p = NULL;
+                return;
+            }
+
+            DWORD bytes_read = 0;
+            connect_ex_fn connect_ex = io_service::get_connect_ex(s);
+            BOOL result = connect_ex(s.socket_, addr, addrlen, 0, 0, &bytes_read, p.p);
+            DWORD last_error = ::WSAGetLastError();
+            if (!result && last_error != WSA_IO_PENDING)
+                io_service_.on_completion(p.p, last_error, 0);
+            else
+                io_service_.on_pending(p.p);
+            p.v = p.p = NULL;
+        }
 	}
 
 	template<typename Handle>
 	void async_read_some(void* buff, unsigned int bufflen, Handle h)
 	{
-		io_service_.async_read_some(*this, buff, bufflen, h);
+		//io_service_.async_read_some(*this, buff, bufflen, h);
+        socket& s = *this;
+
+        typedef io_operation_wr<Handle> op;
+        io_operation_wr<Handle>::ptr p;
+        p.v = asio_handler_alloc(sizeof(op), &h);
+        p.p = new (p.v) op(buff, bufflen, h);
+
+        io_service_.work_started();
+
+        DWORD bytes_read = 0;
+        DWORD flags = 0;
+        int result = ::WSARecv(s.socket_, &p.p->buff_, 1, &bytes_read, &flags, p.p, 0);
+        DWORD last_error = ::WSAGetLastError();
+        if (result != 0 && last_error != WSA_IO_PENDING)
+            io_service_.on_completion(p.p, last_error, 0);
+        else
+            io_service_.on_pending(p.p);
+        p.v = p.p = NULL;
 	}
 
 	template<typename Handle>
 	void async_write_some(void* buff, unsigned int bufflen, Handle h)
 	{
-		io_service_.async_write_some(*this, buff, bufflen, h);
+		//io_service_.async_write_some(*this, buff, bufflen, h);
+        socket& s = *this;
+        typedef io_operation_wr<Handle> op;
+        io_operation_wr<Handle>::ptr p;
+        p.v = asio_handler_alloc(sizeof(op), &h);
+        p.p = new (p.v) op(buff, bufflen, h);
+
+        io_service_.work_started();
+
+        DWORD bytes_read = 0;
+        int result = ::WSASend(s.socket_, &p.p->buff_, 1, &bytes_read, 0, p.p, 0);
+        DWORD last_error = ::WSAGetLastError();
+        if (result != 0 && last_error != WSA_IO_PENDING)
+            io_service_.on_completion(p.p, last_error, 0);
+        else
+            io_service_.on_pending(p.p);
+        p.v = p.p = NULL;
 	}
 
 	template<typename Handle>
@@ -77,10 +158,10 @@ public:
 	unsigned short get_remote_port();
 
 private:
-	friend class iocp_io_service;
-	socket_type socket_;
+	friend class io_service;
 	io_service& io_service_;
-	char remote_addr_[(sizeof(SOCKADDR_IN) + 16)];
+    socket_type socket_;
+	char remote_addr_[(sizeof(SOCKADDR_IN) + 16)]; 
 };
 
 }

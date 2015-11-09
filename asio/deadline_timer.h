@@ -21,7 +21,7 @@ public:
 	unsigned int cancel();
 
 private:
-	friend class iocp_io_service;
+	friend class io_service;
 	io_service& io_service_;
 	per_timer_data per_timer_data_;
 };

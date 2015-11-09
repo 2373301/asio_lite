@@ -42,7 +42,7 @@ int socket::open(int type, int protocol)
 	{
 		return get_last_error(-1);
 	}
-	io_service_.impl_.register_handle(*this);
+	io_service_.register_handle(*this);
 	return 0;
 }
 

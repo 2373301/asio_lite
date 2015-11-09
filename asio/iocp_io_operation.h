@@ -24,13 +24,13 @@ enum
 	io_key_overlapped_contains_result
 };
 
-class iocp_io_service;
+class io_service;
 class socket;
 
 class io_operation : public OVERLAPPED
 {
 public:
-	void complete(iocp_io_service& owner, int error, unsigned int bytes_transferred)
+	void complete(io_service& owner, int error, unsigned int bytes_transferred)
 	{
 		func_(&owner, this, error, bytes_transferred);
 	}
@@ -52,7 +52,7 @@ public:
 	}
 
 protected:
-	typedef void (*func_type)(iocp_io_service*, io_operation*, int, unsigned int);
+	typedef void (*func_type)(io_service*, io_operation*, int, unsigned int);
 	io_operation(func_type f) : func_(f)
 	{
 		reset();
@@ -60,7 +60,7 @@ protected:
 
 	friend class op_queue_access;
 	friend class timer_queue;
-	friend class iocp_io_service;
+	friend class io_service;
 	io_operation* next_;
 	func_type func_;
 	long ready_;
@@ -75,7 +75,7 @@ public:
 
 	io_operation_post(Handler h)
 		: h_(h), io_operation(&io_operation_post::do_complete){}
-	static void do_complete(iocp_io_service* owner, io_operation* base, int error, unsigned int)
+	static void do_complete(io_service* owner, io_operation* base, int error, unsigned int)
 	{
 		io_operation_post* op = static_cast<io_operation_post*>(base);
 		binder0_t<Handler> handler(op->h_);
@@ -100,7 +100,7 @@ public:
 	IO_DEFINE_HANDLER_PTR(io_operation1);
 
 	io_operation1(Handler h) : h_(h), io_operation(&io_operation1::do_complete){}
-	static void do_complete(iocp_io_service* owner, io_operation* base, int error, unsigned int)
+	static void do_complete(io_service* owner, io_operation* base, int error, unsigned int)
 	{
 		io_operation1* op = static_cast<io_operation1*>(base);
 		binder1_t<Handler, int> handler(op->h_, op->error_ != 0 ? op->error_ : error);
@@ -126,7 +126,7 @@ public:
 
 	io_operation_accept(socket& peer, Handler h)
 		: peer_(peer), h_(h), io_operation(&io_operation_accept::do_complete){}
-	static void do_complete(iocp_io_service* owner, io_operation* base, int error, unsigned int)
+	static void do_complete(io_service* owner, io_operation* base, int error, unsigned int)
 	{
 		io_operation_accept* op = static_cast<io_operation_accept*>(base);
 		binder1_t<Handler, int> handler(op->h_, error);
@@ -138,7 +138,7 @@ public:
 			LPSOCKADDR remote_addr = 0;
 			int remote_addr_length = 0;
 			accept_ex_socketaddrs_fn accept_ex_socketaddrs = 
-				iocp_io_service::get_accept_ex_socketaddrs(op->peer_);
+				io_service::get_accept_ex_socketaddrs(op->peer_);
 			accept_ex_socketaddrs(op->output_buffer_, 0, sizeof(SOCKADDR_IN) + 16,
 				sizeof(SOCKADDR_IN) + 16, &local_addr, &local_addr_length,
 				&remote_addr, &remote_addr_length);
@@ -156,7 +156,7 @@ public:
 	}
 
 private:
-	friend class iocp_io_service;
+    friend class socket;
 	socket& peer_;
 	char output_buffer_[(sizeof(SOCKADDR_IN) + 16) * 2];
 	SOCKADDR_IN addr;
@@ -174,7 +174,7 @@ public:
 		buff_.buf = (char*)buff;
 		buff_.len = bufflen;
 	}
-	static void do_complete(iocp_io_service* owner, io_operation* base,
+	static void do_complete(io_service* owner, io_operation* base,
 		int error, unsigned int bytes_transferred)
 	{
 		io_operation_wr* op = static_cast<io_operation_wr*>(base);
@@ -191,7 +191,7 @@ public:
 	}
 
 private:
-	friend class iocp_io_service;
+    friend class socket;
 	Handler h_;
 	WSABUF buff_;
 };

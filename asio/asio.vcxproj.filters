@@ -9,13 +9,12 @@
     <ClInclude Include="handler_alloc.h" />
     <ClInclude Include="socket.h" />
     <ClInclude Include="iocp_io_operation.h" />
-    <ClInclude Include="iocp_io_service.h" />
     <ClInclude Include="io_service.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="timer_queue.cpp" />
     <ClCompile Include="deadline_timer.cpp" />
     <ClCompile Include="socket.cpp" />
-    <ClCompile Include="iocp_io_service.cpp" />
+    <ClCompile Include="io_service.cpp" />
   </ItemGroup>
 </Project>

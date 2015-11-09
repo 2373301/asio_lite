@@ -15,7 +15,6 @@
     <ClInclude Include="deadline_timer.h" />
     <ClInclude Include="handler_alloc.h" />
     <ClInclude Include="iocp_io_operation.h" />
-    <ClInclude Include="iocp_io_service.h" />
     <ClInclude Include="io_operation.h" />
     <ClInclude Include="io_service.h" />
     <ClInclude Include="op_queue.h" />
@@ -24,7 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deadline_timer.cpp" />
-    <ClCompile Include="iocp_io_service.cpp" />
+    <ClCompile Include="io_service.cpp" />
     <ClCompile Include="socket.cpp" />
     <ClCompile Include="timer_queue.cpp" />
   </ItemGroup>
@@ -74,7 +73,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -93,7 +92,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);_WINSOCK_DEPRECATED_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
