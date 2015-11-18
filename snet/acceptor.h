@@ -2,7 +2,7 @@
 
 #include <util/shared_ptr.h>
 #include "connection.h"
-#include <asio/handler_alloc.h>
+
 
 class agent_impl;
 
@@ -21,7 +21,6 @@ private:
 	void handle_close();
 
 private:
-	asio::handler_alloc alloc_;
 	agent_impl& agent_impl_;
 	asio::socket socket_;
 	net_callback* callback_;

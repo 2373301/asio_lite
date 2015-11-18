@@ -56,8 +56,8 @@ void acceptor::start_accept()
 		agent_impl_.get_io_service(), callback_));
 	new_conn->open();
 	socket_.async_accept(new_conn->socket(),
-		asio::make_alloc_handler(alloc_, std::bind(&acceptor::handle_accept,
-		share_from_this(), new_conn, std::placeholders::_1)));
+        std::bind(&acceptor::handle_accept,
+        share_from_this(), new_conn, std::placeholders::_1));
 }
 
 void acceptor::handle_accept(connection_ptr new_conn, int error)
@@ -78,8 +78,8 @@ void acceptor::handle_accept(connection_ptr new_conn, int error)
 	else if (running_)
 	{
 		socket_.async_accept(new_conn->socket(),
-			asio::make_alloc_handler(alloc_, std::bind(&acceptor::handle_accept,
-			share_from_this(), new_conn, std::placeholders::_1)));
+            std::bind(&acceptor::handle_accept,
+            share_from_this(), new_conn, std::placeholders::_1));
 	}
 	else
 	{

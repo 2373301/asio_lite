@@ -182,7 +182,7 @@ void io_service::timer_thread(void)
 }
 
 void io_service::run()
-{
+{   
 	if (::InterlockedExchangeAdd(&outstanding_work_, 0) == 0)
 	{
 		stop();

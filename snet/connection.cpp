@@ -130,9 +130,8 @@ void connection::handle_stop()
 void connection::async_read()
 {
 	socket_.async_read_some(read_data_, 4096,
-		asio::make_alloc_handler(alloc_read_,
-		std::bind(&connection::handle_read, share_from_this(),
-		std::placeholders::_1, std::placeholders::_2)));
+        std::bind(&connection::handle_read, share_from_this(),
+        std::placeholders::_1, std::placeholders::_2));
 }
 
 void connection::handle_read(int error, unsigned read_len)
@@ -171,9 +170,8 @@ void connection::async_write_inner(const void* data, int len)
 	if (!write_in_progress)
 	{
 		socket_.async_write(write_qeueu_.front().buff, write_qeueu_.front().len,
-			asio::make_alloc_handler(alloc_write_,
-			std::bind(&connection::handle_write,
-			share_from_this(), std::placeholders::_1)));
+            std::bind(&connection::handle_write,
+            share_from_this(), std::placeholders::_1));
 	}
 }
 
@@ -194,8 +192,7 @@ void connection::handle_write(int error)
 	if (!write_qeueu_.empty())
 	{
 		socket_.async_write(write_qeueu_.front().buff, write_qeueu_.front().len,
-			asio::make_alloc_handler(alloc_write_,
-			std::bind(&connection::handle_write,
-			share_from_this(), std::placeholders::_1)));
+            std::bind(&connection::handle_write,
+            share_from_this(), std::placeholders::_1));
 	}
 }

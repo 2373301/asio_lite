@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asio", "asio\asio.vcxproj", "{D00AFEAC-FCE0-41A8-9578-2B1125593A12}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_timer", "test_timer\test_timer.vcxproj", "{FDC1050C-4E5C-4DB7-B2D7-E71F1357EB1B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_echo", "test_echo\test_echo.vcxproj", "{598B0FBA-7362-42C1-A2F1-4565B86E0726}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82A880CE-4DEA-418C-9F27-213C07C47820} = {82A880CE-4DEA-418C-9F27-213C07C47820}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "snet", "snet\snet.vcxproj", "{82A880CE-4DEA-418C-9F27-213C07C47820}"
 EndProject

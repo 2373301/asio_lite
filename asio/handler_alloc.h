@@ -2,11 +2,11 @@
 
 namespace asio
 {
-
-class handler_alloc
+// mem ∑÷≈‰∆˜
+class mem_allocator
 {
 public:
-	handler_alloc()
+	mem_allocator()
 		: in_use_(false)
 	{
 	}
@@ -45,7 +45,7 @@ template <typename Handler>
 class alloc_handler
 {
 public:
-	alloc_handler(handler_alloc& a, Handler h)
+	alloc_handler(mem_allocator& a, Handler h)
 		: allocator_(a), handler_(h)
 	{
 	}
@@ -79,13 +79,13 @@ public:
 	}
 
 private:
-	handler_alloc& allocator_;
+	mem_allocator& allocator_;
 	Handler handler_;
 };
 
 template <typename Handler>
 inline alloc_handler<Handler> make_alloc_handler(
-	handler_alloc& a, Handler h)
+	mem_allocator& a, Handler h)
 {
 	return alloc_handler<Handler>(a, h);
 }

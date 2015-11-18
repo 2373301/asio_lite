@@ -13,8 +13,6 @@
   <ItemGroup>
     <ClInclude Include="binder.h" />
     <ClInclude Include="deadline_timer.h" />
-    <ClInclude Include="handler_alloc.h" />
-    <ClInclude Include="iocp_io_operation.h" />
     <ClInclude Include="io_operation.h" />
     <ClInclude Include="io_service.h" />
     <ClInclude Include="op_queue.h" />

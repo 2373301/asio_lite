@@ -5,7 +5,7 @@
 #include <util/shared_ptr.h>
 #include <asio/io_service.h>
 #include <asio/deadline_timer.h>
-#include <asio/handler_alloc.h>
+
 #include "snet.h"
 
 class agent_impl;
@@ -42,8 +42,6 @@ private:
 	void async_write_inner(const void* data, int len);
 	void handle_write(int error);
 
-	asio::handler_alloc alloc_read_;
-	asio::handler_alloc alloc_write_;
 	agent_impl& agent_impl_;
 	net_callback* callback_;
 	asio::socket socket_;

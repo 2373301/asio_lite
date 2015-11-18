@@ -26,24 +26,19 @@ public:
     void post(Handle h)
     {
         typedef io_operation_post<Handle> op;
-        io_operation_post<Handle>::ptr p;
-        p.v = asio_handler_alloc(sizeof(op), &h);
-        p.p = new (p.v) op(h);
-        post_immediate_completion(p.p);
-        p.v = p.p = NULL;
+        op* p = new op(h);
+        post_immediate_completion(p);
     }
 
     template<typename Handle>
     void add_async_timer(deadline_timer& timer, long millisec, Handle h)
     {
         typedef io_operation1<Handle> op;
-        io_operation1<Handle>::ptr p;
-        p.v = asio_handler_alloc(sizeof(op), &h);
-        p.p = new (p.v) op(h);
+        op* p = new op(h);
 
         if (::InterlockedExchangeAdd(&shutdown_, 0) != 0)
         {
-            post_immediate_completion(p.p);
+            post_immediate_completion(p);
             return;
         }
 
@@ -55,8 +50,7 @@ public:
             timer_thread_.swap(t);
         }
         bool earliest = timer_queue_.enqueue_timer(
-            get_time() + millisec, timer.per_timer_data_, p.p);
-        p.v = p.p = NULL;
+            get_time() + millisec, timer.per_timer_data_, p);
 
         work_started();
         if (earliest)
@@ -98,7 +92,7 @@ private:
     long shutdown_;
     long stopped_;
     long stop_event_posted_;
-    long outstanding_work_;
+    long outstanding_work_;  // 待执行的任务数
     long dispatch_required_;
     std::mutex dispatch_mutex_;
     timer_queue timer_queue_;
@@ -107,9 +101,9 @@ private:
     static accept_ex_socketaddrs_fn accept_ex_socketaddrs_;
     static connect_ex_fn connect_ex_;
 
-    private:
-        friend class work;
-        friend class socket;
+private:
+    friend class work;
+    friend class socket;
 };
 
 inline int get_last_error(int default_error = -1)
