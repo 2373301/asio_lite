@@ -71,8 +71,6 @@ template <typename Handler>
 class io_operation_post : public io_operation
 {
 public:
-	//IO_DEFINE_HANDLER_PTR(io_operation_post);
-
 	io_operation_post(Handler h)
 		: h_(h), io_operation(&io_operation_post::do_complete){}
 	static void do_complete(io_service* owner, io_operation* base, int error, unsigned int)
@@ -80,8 +78,6 @@ public:
 		io_operation_post* op = static_cast<io_operation_post*>(base);
 		binder0_t<Handler> handler(op->h_);
 
-		//ptr p = { &op->h_, op, op };
-		//p.reset();
         delete op;
 
 		if (owner)
@@ -98,17 +94,11 @@ template <typename Handler>
 class io_operation1 : public io_operation
 {
 public:
-	//IO_DEFINE_HANDLER_PTR(io_operation1);
-
 	io_operation1(Handler h) : h_(h), io_operation(&io_operation1::do_complete){}
 	static void do_complete(io_service* owner, io_operation* base, int error, unsigned int)
 	{
 		io_operation1* op = static_cast<io_operation1*>(base);
 		binder1_t<Handler, int> handler(op->h_, op->error_ != 0 ? op->error_ : error);
-
-		//ptr p = { &op->h_, op, op };
-		//p.reset();
-        delete op;
 
 		if (owner)
 		{
@@ -124,8 +114,6 @@ template <typename Handler>
 class io_operation_accept : public io_operation
 {
 public:
-	//IO_DEFINE_HANDLER_PTR(io_operation_accept);
-
 	io_operation_accept(socket& peer, Handler h)
 		: peer_(peer), h_(h), io_operation(&io_operation_accept::do_complete){}
 	static void do_complete(io_service* owner, io_operation* base, int error, unsigned int)
@@ -144,12 +132,9 @@ public:
 			accept_ex_socketaddrs(op->output_buffer_, 0, sizeof(SOCKADDR_IN) + 16,
 				sizeof(SOCKADDR_IN) + 16, &local_addr, &local_addr_length,
 				&remote_addr, &remote_addr_length);
-			//op->peer_.get_io_service().register_handle(op->peer_);
 			op->peer_.set_remote_addr(remote_addr, remote_addr_length);
 		}
 
-// 		ptr p = { &op->h_, op, op };
-// 		p.reset();
         delete op;
 
 		if (owner)
@@ -170,7 +155,6 @@ template <typename Handler>
 class io_operation_wr : public io_operation
 {
 public:
-	//IO_DEFINE_HANDLER_PTR(io_operation_wr);
 	io_operation_wr(const void* buff, unsigned int bufflen, Handler h)
 		: h_(h), io_operation(&io_operation_wr::do_complete)
 	{
@@ -184,8 +168,6 @@ public:
 		binder2_t<Handler, int, unsigned int> 
 			handler(op->h_, error, bytes_transferred);
 
-// 		ptr p = { &op->h_, op, op };
-// 		p.reset();
         delete op;
 
 		if (owner)
