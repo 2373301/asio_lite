@@ -3,7 +3,7 @@
 #include <functional>
 
 connection::connection(agent_impl& agent_impl,
-	asio::io_service& io_service, net_callback* callback)
+	x::io_service& io_service, net_callback* callback)
 	: agent_impl_(agent_impl)
 	, callback_(callback)
 	, socket_(io_service)
@@ -64,10 +64,10 @@ void connection::async_connect(const char* ipaddr, unsigned short port,
 	}
 	socket_.async_connect(ipaddr, port, 
 		std::bind(&connection::handle_connect,
-		share_from_this(), std::placeholders::_1));
+		shared_from_this(), std::placeholders::_1));
 
 	timer_.async_wait(timeout_millis, std::bind(&connection::handle_conn_timer,
-		share_from_this(), std::placeholders::_1));
+		shared_from_this(), std::placeholders::_1));
 }
 
 void connection::handle_conn_timer(int error)
@@ -105,7 +105,7 @@ void connection::close()
 {
 	running_ = false;
 	socket_.get_io_service().post(
-		std::bind(&connection::handle_stop, share_from_this()));
+		std::bind(&connection::handle_stop, shared_from_this()));
 }
 
 void connection::stop_connection()
@@ -130,7 +130,7 @@ void connection::handle_stop()
 void connection::async_read()
 {
 	socket_.async_read_some(read_data_, 4096,
-        std::bind(&connection::handle_read, share_from_this(),
+        std::bind(&connection::handle_read, shared_from_this(),
         std::placeholders::_1, std::placeholders::_2));
 }
 
@@ -156,7 +156,7 @@ void connection::async_write(const void* data, int len)
 	memcpy((char*)new_data, data, len);
 	socket_.get_io_service().post(
 		std::bind(&connection::async_write_inner,
-		share_from_this(), new_data, len));
+		shared_from_this(), new_data, len));
 }
 
 void connection::async_write_inner(const void* data, int len)
@@ -171,7 +171,7 @@ void connection::async_write_inner(const void* data, int len)
 	{
 		socket_.async_write(write_qeueu_.front().buff, write_qeueu_.front().len,
             std::bind(&connection::handle_write,
-            share_from_this(), std::placeholders::_1));
+            shared_from_this(), std::placeholders::_1));
 	}
 }
 
@@ -193,6 +193,6 @@ void connection::handle_write(int error)
 	{
 		socket_.async_write(write_qeueu_.front().buff, write_qeueu_.front().len,
             std::bind(&connection::handle_write,
-            share_from_this(), std::placeholders::_1));
+            shared_from_this(), std::placeholders::_1));
 	}
 }

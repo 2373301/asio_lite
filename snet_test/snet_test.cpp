@@ -4,9 +4,8 @@
 #include <functional>
 #define WIN32_LEAN_AND_MEAN
 #include <snet/snet.h>
-#include <util/mutex.h>
-#include <asio/io_service.h>
-#include <asio/deadline_timer.h>
+#include <x/io_service.h>
+#include <x/deadline_timer.h>
 
 using namespace std;
 
@@ -69,8 +68,8 @@ private:
 	net_agent* agent_;
 	std::mutex mutex_;
 	set<unsigned> conn_ids_;
-	asio::io_service io_service_;
-	asio::deadline_timer timer_stop_;
+	x::io_service io_service_;
+	x::deadline_timer timer_stop_;
 };
 
 class client : public net_callback
@@ -78,7 +77,7 @@ class client : public net_callback
 public:
 	client() : timer_send_(io_service_), timer_stop_(io_service_)
 	{
-		asio::io_service::work* work = new asio::io_service::work(io_service_);
+		x::io_service::work* work = new x::io_service::work(io_service_);
 		agent_ = create_net_agent();
 		agent_->init(this, 5);
 	}
@@ -159,9 +158,9 @@ private:
 	net_agent* agent_;
 	std::mutex mutex_;
 	set<unsigned> conn_ids_;
-	asio::io_service io_service_;
-	asio::deadline_timer timer_send_;
-	asio::deadline_timer timer_stop_;
+	x::io_service io_service_;
+	x::deadline_timer timer_send_;
+	x::deadline_timer timer_stop_;
 	char buff[1024];
 };
 

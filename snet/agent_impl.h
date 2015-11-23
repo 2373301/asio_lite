@@ -3,7 +3,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <functional>
 #include <map>
-#include <util/mutex.h>
 #include "snet.h"
 #include "work_thread.h"
 #include "connection.h"
@@ -17,7 +16,7 @@ public:
 	static agent_impl* create();
 	virtual ~agent_impl();
 
-	asio::io_service& get_io_service();
+	x::io_service& get_io_service();
 	void add_connection(connection_ptr conn);
 	connection_ptr get_connetion(unsigned id);
 	void del_connection(unsigned id);

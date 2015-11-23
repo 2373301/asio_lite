@@ -67,7 +67,7 @@ void agent_impl::release()
 	delete this;
 }
 
-asio::io_service& agent_impl::get_io_service()
+x::io_service& agent_impl::get_io_service()
 {
 	int index = (thread_index_++) % thread_num_;
 	return threads_[index].get_io_service();
@@ -80,7 +80,7 @@ int agent_impl::start_server(unsigned short port)
 	int ret = acceptor_->start(port, net_callback_);
 	if (ret != 0)
 	{
-		acceptor_.reset(NULL);
+		acceptor_.reset();
 	}
 	return 0;
 }
@@ -90,7 +90,7 @@ void agent_impl::stop_server()
 	if (acceptor_.get())
 	{
 		acceptor_->stop();
-		acceptor_.reset(NULL);
+		acceptor_.reset();
 	}
 }
 

@@ -2,24 +2,24 @@
 
 #include <string>
 #include <deque>
-#include <util/shared_ptr.h>
-#include <asio/io_service.h>
-#include <asio/deadline_timer.h>
+#include <memory>
+#include <x/io_service.h>
+#include <x/deadline_timer.h>
 
 #include "snet.h"
 
 class agent_impl;
 
-class connection : public util::enable_share_from_this<connection>
+class connection : public std::enable_shared_from_this<connection>
 {
 public:
 	connection(agent_impl& agent_impl, 
-		asio::io_service& io_service, net_callback* callback);
+		x::io_service& io_service, net_callback* callback);
 	~connection();
 
 	int open();
 
-	asio::socket& socket() { return socket_; }
+	x::socket& socket() { return socket_; }
 	void set_id(unsigned id){id_ = id;}
 	unsigned get_id(){return id_;}
 	std::string get_remote_ip();
@@ -44,9 +44,9 @@ private:
 
 	agent_impl& agent_impl_;
 	net_callback* callback_;
-	asio::socket socket_;
+	x::socket socket_;
 	unsigned id_;
-	asio::deadline_timer timer_;
+	x::deadline_timer timer_;
 	bool connected_;
 	bool running_;
 	char read_data_[4096];
@@ -59,4 +59,4 @@ private:
 	std::deque<len_buff> write_qeueu_;
 };
 
-typedef util::shared_ptr<connection> connection_ptr;
+typedef std::shared_ptr<connection> connection_ptr;

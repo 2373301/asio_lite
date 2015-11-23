@@ -2,7 +2,7 @@
 #include "connection.h"
 #include "agent_impl.h"
 
-acceptor::acceptor(agent_impl& agent_impl, asio::io_service& io_service)
+acceptor::acceptor(agent_impl& agent_impl, x::io_service& io_service)
 	: agent_impl_(agent_impl)
 	, socket_(io_service)
 	, running_(false)
@@ -47,7 +47,7 @@ int acceptor::start(unsigned short port, net_callback* callback)
 
 void acceptor::stop()
 {
-	socket_.get_io_service().post(std::bind(&acceptor::handle_close, share_from_this()));
+	socket_.get_io_service().post(std::bind(&acceptor::handle_close, shared_from_this()));
 }
 
 void acceptor::start_accept()
@@ -57,7 +57,7 @@ void acceptor::start_accept()
 	new_conn->open();
 	socket_.async_accept(new_conn->socket(),
         std::bind(&acceptor::handle_accept,
-        share_from_this(), new_conn, std::placeholders::_1));
+        shared_from_this(), new_conn, std::placeholders::_1));
 }
 
 void acceptor::handle_accept(connection_ptr new_conn, int error)
@@ -79,7 +79,7 @@ void acceptor::handle_accept(connection_ptr new_conn, int error)
 	{
 		socket_.async_accept(new_conn->socket(),
             std::bind(&acceptor::handle_accept,
-            share_from_this(), new_conn, std::placeholders::_1));
+            shared_from_this(), new_conn, std::placeholders::_1));
 	}
 	else
 	{

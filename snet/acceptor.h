@@ -1,15 +1,15 @@
 #pragma once
 
-#include <util/shared_ptr.h>
+#include <memory>
 #include "connection.h"
 
 
 class agent_impl;
 
-class acceptor : public util::enable_share_from_this<acceptor>
+class acceptor : public std::enable_shared_from_this<acceptor>
 {
 public:
-	acceptor(agent_impl& agent_impl, asio::io_service& io_service);
+	acceptor(agent_impl& agent_impl, x::io_service& io_service);
 	~acceptor();
 
 	int start(unsigned short port, net_callback* callback);
@@ -22,9 +22,9 @@ private:
 
 private:
 	agent_impl& agent_impl_;
-	asio::socket socket_;
+	x::socket socket_;
 	net_callback* callback_;
 	bool running_;
 };
 
-typedef util::shared_ptr<acceptor> acceptor_ptr;
+typedef std::shared_ptr<acceptor> acceptor_ptr;

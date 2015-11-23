@@ -11,11 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\asio\asio.vcxproj">
-      <Project>{d00afeac-fce0-41a8-9578-2b1125593a12}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="acceptor.h" />
     <ClInclude Include="agent_impl.h" />
     <ClInclude Include="connection.h" />

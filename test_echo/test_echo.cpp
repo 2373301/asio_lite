@@ -1,22 +1,21 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <functional>
-#include <util/thread.h>
-#include <asio/io_service.h>
-#include <asio/deadline_timer.h>
+#include <x/io_service.h>
+#include <x/deadline_timer.h>
 
 int str_char(char* str, int len, char c);
 
 class session
 {
 public:
-	session(asio::io_service& io_service)
+	session(x::io_service& io_service)
 		: socket_(io_service), len_(0)
 	{
 		socket_.open();
 	}
 
-	asio::socket& socket()
+	x::socket& socket()
 	{
 		return socket_;
 	}
@@ -69,7 +68,7 @@ public:
 	}
 
 private:
-	asio::socket socket_;
+	x::socket socket_;
 	enum { max_length = 1024 };
 	char data_[max_length];
 	int len_;
@@ -78,7 +77,7 @@ private:
 class server
 {
 public:
-	server(asio::io_service& io_service, short port)
+	server(x::io_service& io_service, short port)
 		: io_service_(io_service), acceptor_(io_service)
 	{
 		acceptor_.open();
@@ -108,20 +107,21 @@ public:
 	}
 
 private:
-	asio::io_service& io_service_;
-	asio::socket acceptor_;
+	x::io_service& io_service_;
+	x::socket acceptor_;
 };
 
 int main()
 {
-	asio::io_service io_service;
+	x::io_service io_service;
 	server s(io_service, 8000);
 
 	const int THREAD_NUM = 5;
-	util::thread threads[THREAD_NUM];
+	std::thread threads[THREAD_NUM];
 	for (std::size_t i = 0; i < THREAD_NUM; ++i)
-	{
-		threads->start(&io_service, &asio::io_service::run);
+	{   
+        std::thread temp( &x::io_service::run, &io_service);
+        temp.swap(threads[i]);
 	}
 
 	for (std::size_t i = 0; i < THREAD_NUM; ++i)

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <functional>
-#include <asio/io_service.h>
-#include <asio/deadline_timer.h>
+#include <x/io_service.h>
+#include <x/deadline_timer.h>
 
 void handle_timer(int error)  
 {  
@@ -9,7 +9,7 @@ void handle_timer(int error)
 }  
 
 void handle_wait(int error,  
-				 asio::deadline_timer& t,   
+				 x::deadline_timer& t,   
 				 int& count)  
 {  
 	if(!error)  
@@ -34,13 +34,13 @@ void handle_wait(int error,
 int main()
 {
 	const int wait_millisec = 1000;
-	asio::io_service io_service;
-	asio::deadline_timer t1(io_service);
+	x::io_service io_service;
+	x::deadline_timer t1(io_service);
 
 	int count = 0;
 	t1.async_wait(wait_millisec, handle_timer);
 
-	asio::deadline_timer t2(io_service);
+	x::deadline_timer t2(io_service);
 	t2.async_wait(wait_millisec, std::bind(handle_wait,   
 		std::placeholders::_1,  
 		std::ref(t2),  
