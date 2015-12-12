@@ -15,12 +15,12 @@ public:
 
 
 	template<typename Handle>
-	void async_wait(long millisec, Handle h)
+	void async_wait(int32_t millisec, Handle h)
 	{
 		io_service_.add_async_timer(*this, millisec, h);
 	}
 
-	unsigned int cancel();
+	uint32_t cancel();
 
 private:
 	friend class io_service;

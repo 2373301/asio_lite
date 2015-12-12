@@ -12,12 +12,12 @@ public:
 	acceptor(agent_impl& agent_impl, x::io_service& io_service);
 	~acceptor();
 
-	int start(unsigned short port, net_callback* callback);
+	int32_t start(unsigned short port, net_callback* callback);
 	void stop();
 
 private:
 	void start_accept();
-	void handle_accept(connection_ptr new_conn, int error);
+	void handle_accept(connection_ptr new_conn, int32_t error);
 	void handle_close();
 
 private:

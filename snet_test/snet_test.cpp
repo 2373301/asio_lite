@@ -20,7 +20,7 @@ public:
 	{
 		agent_ = create_net_agent();
 		agent_->init(this, 5);
-		int ret = agent_->start_server(8000);
+		int32_t ret = agent_->start_server(8000);
 		if (ret != 0)
 		{
 			std::unique_lock<std::mutex> ul(mutex_);
@@ -28,11 +28,11 @@ public:
 		}
 		timer_stop_.async_wait(12000, std::bind(&server::handle_stop_timer, this, std::placeholders::_1));
 	}
-	void handle_stop_timer(int error)
+	void handle_stop_timer(int32_t error)
 	{
 		std::unique_lock<std::mutex> ul(mutex_);
 		cout << "handle_stop_timer: ids(" << conn_ids_.size() << "," << agent_->getids() << ")" << endl;
-		int count  = 0;
+		int32_t count  = 0;
 		while (count++ < 20 && !conn_ids_.empty())
 		{
 			auto iter = conn_ids_.begin();
@@ -87,7 +87,7 @@ public:
 			std::unique_lock<std::mutex> ul(mutex_);
 			cout << "connect..." << endl;
 		}
-		for (int i = 0; i < 300; ++i)
+		for (int32_t i = 0; i < 300; ++i)
 		{
 			unsigned id = agent_->connect("127.0.0.1", 8000, 5000, 0);
 			
@@ -96,7 +96,7 @@ public:
 		timer_send_.async_wait(500, std::bind(&client::handle_send_timer, this, std::placeholders::_1));
 	}
 
-	void handle_send_timer(int error)
+	void handle_send_timer(int32_t error)
 	{
 		{
 			std::unique_lock<std::mutex> ul(mutex_);
@@ -124,7 +124,7 @@ public:
 		}
 	}
 
-	virtual void on_connect(unsigned id, int result)
+	virtual void on_connect(unsigned id, int32_t result)
 	{
 		std::unique_lock<std::mutex> ul(mutex_);
 		if (result == 0)
@@ -154,7 +154,7 @@ public:
 	}
 
 private:
-	int count_;
+	int32_t count_;
 	net_agent* agent_;
 	std::mutex mutex_;
 	set<unsigned> conn_ids_;
@@ -166,7 +166,7 @@ private:
 
 
 
-int main(int argc, char** argv)
+int32_t main(int32_t argc, char** argv)
 {
 	if (argc == 2)
 	{

@@ -19,7 +19,7 @@ private:
 	Handler h_;
 };
 
-// 绑定一个参数
+// 绑定1个参数
 template<typename Handler, typename A1>
 class binder1_t
 {

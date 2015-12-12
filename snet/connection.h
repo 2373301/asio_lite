@@ -17,7 +17,7 @@ public:
 		x::io_service& io_service, net_callback* callback);
 	~connection();
 
-	int open();
+	int32_t open();
 
 	x::socket& socket() { return socket_; }
 	void set_id(unsigned id){id_ = id;}
@@ -26,21 +26,21 @@ public:
 	unsigned short get_remote_port();
 
 	void async_connect(const char* ipaddr, unsigned short port, 
-		int timeout_millis, unsigned short local_port);
+		int32_t timeout_millis, unsigned short local_port);
 
 	void async_read();
-	void async_write(const void* data, int len);
+	void async_write(const void* data, int32_t len);
 	void close();
 
 private:
-	void handle_connect(int error);
-	void handle_conn_timer(int error);
-	void connect_finish(int error);
+	void handle_connect(int32_t error);
+	void handle_conn_timer(int32_t error);
+	void connect_finish(int32_t error);
 	void handle_stop();
 	void stop_connection();
-	void handle_read(int error, unsigned read_len);
-	void async_write_inner(const void* data, int len);
-	void handle_write(int error);
+	void handle_read(int32_t error, unsigned read_len);
+	void async_write_inner(const void* data, int32_t len);
+	void handle_write(int32_t error);
 
 	agent_impl& agent_impl_;
 	net_callback* callback_;
@@ -53,7 +53,7 @@ private:
 
 	struct len_buff
 	{
-		int len;
+		int32_t len;
 		const void* buff;
 	};
 	std::deque<len_buff> write_qeueu_;

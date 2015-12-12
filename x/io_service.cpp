@@ -11,9 +11,9 @@
 namespace x
 {
 
-accept_ex_fn io_service::accept_ex_;
-accept_ex_socketaddrs_fn io_service::accept_ex_socketaddrs_;
-connect_ex_fn io_service::connect_ex_;
+LPAcceptEx io_service::accept_ex_;
+LPGetAcceptExSockaddrs io_service::accept_ex_socketaddrs_;
+LPConnectEx io_service::connect_ex_;
 
 struct work_finished_on_block_exit
 {
@@ -59,7 +59,7 @@ void io_service::work_finished()
 	}
 }
 
-int io_service::register_handle(x::socket& s)
+int32_t io_service::register_handle(x::socket& s)
 {
 	if (::CreateIoCompletionPort((HANDLE)s.socket_, iocp_, 0, 0) == 0)
 	{
@@ -87,8 +87,8 @@ void io_service::reset()
 
 void io_service::update_timeout()
 {
-	const long max_timeout_msec = (std::numeric_limits<long>::max)();
-	long timeout_msec = timer_queue_.wait_duration_msec(max_timeout_msec);
+	const int32_t max_timeout_msec = (std::numeric_limits<int32_t>::max)();
+	int32_t timeout_msec = timer_queue_.wait_duration_msec(max_timeout_msec);
 	if (timeout_msec < max_timeout_msec)
 	{
 		LARGE_INTEGER timeout;
@@ -97,13 +97,13 @@ void io_service::update_timeout()
 	}
 }
 
-unsigned int io_service::cancel_timer(deadline_timer& timer)
+uint32_t io_service::cancel_timer(deadline_timer& timer)
 {
 	if (::InterlockedExchangeAdd(&shutdown_, 0) != 0)
 		return 0;
 	std::unique_lock<std::mutex> lock(dispatch_mutex_);
 	op_queue<io_operation> ops;
-	unsigned int n = timer_queue_.cancel_timer(timer.per_timer_data_, ops);
+	uint32_t n = timer_queue_.cancel_timer(timer.per_timer_data_, ops);
 	post_deferred_completions(ops);
 	return n;
 }
@@ -163,11 +163,11 @@ void io_service::post_deferred_completions(op_queue<io_operation>& ops)
 	}
 }
 
-long long io_service::get_time()
+int64_t io_service::get_milli_secs()
 {
 	_timeb timebuffer;
 	_ftime(&timebuffer);
-	long long now = timebuffer.time * 1000 + timebuffer.millitm;
+	int64_t now = timebuffer.time * 1000 + timebuffer.millitm;
 	return now;
 }
 
@@ -201,11 +201,13 @@ void io_service::run()
 			update_timeout();
 		}
 		
+        // Get the next operation from the queue.
 		DWORD bytes_transferred = 0;
 		ULONG_PTR completion_key = 0;
 		LPOVERLAPPED overlapped = 0;
 		::SetLastError(0);
 
+        // 该函数导致线程在完成端口上进行等待，直到超时或者某个完成端口数据包到来
 		BOOL ok = ::GetQueuedCompletionStatus(iocp_, &bytes_transferred,
 			&completion_key, &overlapped, INFINITE);
 		DWORD last_error = ::GetLastError();
@@ -213,22 +215,34 @@ void io_service::run()
 		if (overlapped)
 		{
 			io_operation* op = static_cast<io_operation*>(overlapped);
+
+            // We may have been passed the last_error and bytes_transferred in the
+            // OVERLAPPED structure itself.
 			if (completion_key == io_key_overlapped_contains_result)
 			{
 				last_error = op->Offset;
 				bytes_transferred = op->OffsetHigh;
 			}
 			else
-			{
+			{   
+                // Otherwise ensure any result has been saved into the OVERLAPPED
+                // structure.
 				op->Offset = last_error;
 				op->OffsetHigh = bytes_transferred;
 			}
 
+            // Dispatch the operation only if ready. The operation may not be ready
+            // if the initiating function (e.g. a call to WSARecv) has not yet
+            // returned. This is because the initiating function still wants access
+            // to the operation's OVERLAPPED structure.
 			if (::InterlockedCompareExchange(&op->ready_, 1, 0) == 1)
-			{
+			{   
+                // 该变量保证在操作完成，return之后，io_service对象所记录的任务数outstanding_work_会自动减1
 				work_finished_on_block_exit on_exit = { this };
+                // 这一行从功能上讲没有什么特别的用途；不过有了这一行，
+                // 可以抑制有些编译器针对on_exit 声明的变量没有被使用的编译器警告
 				(void)on_exit;
-
+                // 调用operation对象的complete()函数,从而调用到异步操作所设定的回调函数
 				op->complete(*this, last_error, bytes_transferred);
 				continue;
 			}
@@ -307,7 +321,7 @@ void io_service::shutdown_service()
 	::CloseHandle(iocp_);
 }
 
-accept_ex_fn io_service::get_accept_ex(socket& s)
+LPAcceptEx io_service::get_AcceptEx(socket& s)
 {
 	void* ptr = InterlockedCompareExchangePointer((void**)&accept_ex_, 0, 0);
 	if (!ptr)
@@ -322,10 +336,10 @@ accept_ex_fn io_service::get_accept_ex(socket& s)
 
 		InterlockedExchangePointer((PVOID*)&accept_ex_, ptr);
 	}
-	return reinterpret_cast<accept_ex_fn>(ptr == (void*)0x100 ? 0 : ptr);
+	return reinterpret_cast<LPAcceptEx>(ptr == (void*)0x100 ? 0 : ptr);
 }
 
-accept_ex_socketaddrs_fn io_service::get_accept_ex_socketaddrs(socket& s)
+LPGetAcceptExSockaddrs io_service::get_GetAcceptExSockaddrs(socket& s)
 {
 	void* ptr = InterlockedCompareExchangePointer((void**)&accept_ex_socketaddrs_, 0, 0);
 	if (!ptr)
@@ -340,10 +354,10 @@ accept_ex_socketaddrs_fn io_service::get_accept_ex_socketaddrs(socket& s)
 
 		InterlockedExchangePointer((PVOID*)&connect_ex_, ptr);
 	}
-	return reinterpret_cast<accept_ex_socketaddrs_fn>(ptr == (void*)0x100 ? 0 : ptr);
+	return reinterpret_cast<LPGetAcceptExSockaddrs>(ptr == (void*)0x100 ? 0 : ptr);
 }
 
-connect_ex_fn io_service::get_connect_ex(socket& s)
+LPConnectEx io_service::get_ConnectEx(socket& s)
 {
 	void* ptr = InterlockedCompareExchangePointer((void**)&connect_ex_, 0, 0);
 	if (!ptr)
@@ -359,7 +373,7 @@ connect_ex_fn io_service::get_connect_ex(socket& s)
 
 		InterlockedExchangePointer((PVOID*)&connect_ex_, ptr);
 	}
-	return reinterpret_cast<connect_ex_fn>(ptr == (void*)0x100 ? 0 : ptr);
+	return reinterpret_cast<LPConnectEx>(ptr == (void*)0x100 ? 0 : ptr);
 }
 
 }

@@ -69,15 +69,15 @@ void agent_impl::release()
 
 x::io_service& agent_impl::get_io_service()
 {
-	int index = (thread_index_++) % thread_num_;
+	int32_t index = (thread_index_++) % thread_num_;
 	return threads_[index].get_io_service();
 }
 
-int agent_impl::start_server(unsigned short port)
+int32_t agent_impl::start_server(unsigned short port)
 {
 	stop_server();
 	acceptor_.reset(new acceptor(*this, get_io_service()));
-	int ret = acceptor_->start(port, net_callback_);
+	int32_t ret = acceptor_->start(port, net_callback_);
 	if (ret != 0)
 	{
 		acceptor_.reset();
@@ -126,7 +126,7 @@ void agent_impl::del_connection(unsigned id)
 }
 
 unsigned agent_impl::connect(const char* ipaddr, unsigned short port, 
-				 int timeout_millis, unsigned short local_port)
+				 int32_t timeout_millis, unsigned short local_port)
 {
 	connection_ptr new_conn(new connection(*this, get_io_service(), net_callback_));
 	add_connection(new_conn);
@@ -134,7 +134,7 @@ unsigned agent_impl::connect(const char* ipaddr, unsigned short port,
 	return new_conn->get_id();
 }
 
-int agent_impl::send_data(unsigned id, const void* data, int len)
+int32_t agent_impl::send_data(unsigned id, const void* data, int32_t len)
 {
 	connection_ptr conn = get_connetion(id);
 	if (conn.get() != NULL)

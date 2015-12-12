@@ -19,7 +19,7 @@ private:
 	friend class timer_queue;
 
 	io_operation* op_;
-	unsigned int heap_index_;
+	uint32_t heap_index_;
 	per_timer_data* next_;
 	per_timer_data* prev_;
 };
@@ -31,23 +31,23 @@ public:
 	timer_queue();
 	~timer_queue();
 
-	bool enqueue_timer(long long time, per_timer_data& timer, io_operation* op);
+	bool enqueue_timer(int64_t time, per_timer_data& timer, io_operation* op);
 	bool empty() const;
-	unsigned int cancel_timer(per_timer_data& timer, op_queue<io_operation>& ops);
-	long wait_duration_msec(long max_duration) const;
+	uint32_t cancel_timer(per_timer_data& timer, op_queue<io_operation>& ops);
+	int32_t wait_duration_msec(int32_t max_duration) const;
 	void get_ready_timers(op_queue<io_operation>& ops);
 	void get_all_timers(op_queue<io_operation>& ops);
-	unsigned int get_size();
+	uint32_t get_size();
 
 private:
 	void remove_timer(per_timer_data& timer);
-	void up_heap(unsigned int index);
-	void down_heap(unsigned int index);
-	void swap_heap(unsigned int index1, unsigned int index2);
+	void up_heap(uint32_t index);
+	void down_heap(uint32_t index);
+	void swap_heap(uint32_t index1, uint32_t index2);
 
 	struct heap_entry
 	{
-		long long time;
+		int64_t time;
 		per_timer_data* timer;
 	};
 

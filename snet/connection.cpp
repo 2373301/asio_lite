@@ -17,7 +17,7 @@ connection::~connection()
 {
 }
 
-int connection::open()
+int32_t connection::open()
 {
 	return socket_.open();
 }
@@ -33,9 +33,9 @@ unsigned short connection::get_remote_port()
 }
 
 void connection::async_connect(const char* ipaddr, unsigned short port, 
-				   int timeout_millis, unsigned short local_port)
+				   int32_t timeout_millis, unsigned short local_port)
 {
-	int ret = socket_.open();
+	int32_t ret = socket_.open();
 	if (ret != 0)
 	{
 		agent_impl_.del_connection(id_);
@@ -46,10 +46,10 @@ void connection::async_connect(const char* ipaddr, unsigned short port,
 		return;
 	}
 
-	int reuse_addr = 1;
+	int32_t reuse_addr = 1;
 	socket_.set_option(SOL_SOCKET, SO_REUSEADDR, (char*)&reuse_addr, sizeof(reuse_addr));
 
-	int nodelay = 1;
+	int32_t nodelay = 1;
 	socket_.set_option(IPPROTO_TCP, TCP_NODELAY, (char*)&reuse_addr, sizeof(reuse_addr));
 
 	ret = socket_.bind(local_port);
@@ -70,7 +70,7 @@ void connection::async_connect(const char* ipaddr, unsigned short port,
 		shared_from_this(), std::placeholders::_1));
 }
 
-void connection::handle_conn_timer(int error)
+void connection::handle_conn_timer(int32_t error)
 {
 	if (!connected_)
 	{
@@ -78,7 +78,7 @@ void connection::handle_conn_timer(int error)
 	}
 }
 
-void connection::handle_connect(int error)
+void connection::handle_connect(int32_t error)
 {
 	connect_finish(error);
 	if (!error)
@@ -88,7 +88,7 @@ void connection::handle_connect(int error)
 	}
 }
 
-void connection::connect_finish(int error)
+void connection::connect_finish(int32_t error)
 {
 	timer_.cancel();
 	if (callback_)
@@ -134,7 +134,7 @@ void connection::async_read()
         std::placeholders::_1, std::placeholders::_2));
 }
 
-void connection::handle_read(int error, unsigned read_len)
+void connection::handle_read(int32_t error, unsigned read_len)
 {
 	if (!error && read_len > 0)
 	{
@@ -150,7 +150,7 @@ void connection::handle_read(int error, unsigned read_len)
 	}
 }
 
-void connection::async_write(const void* data, int len)
+void connection::async_write(const void* data, int32_t len)
 {
 	void* new_data = ::malloc(len);
 	memcpy((char*)new_data, data, len);
@@ -159,7 +159,7 @@ void connection::async_write(const void* data, int len)
 		shared_from_this(), new_data, len));
 }
 
-void connection::async_write_inner(const void* data, int len)
+void connection::async_write_inner(const void* data, int32_t len)
 {
 	len_buff lbuff;
 	lbuff.len = len;
@@ -175,7 +175,7 @@ void connection::async_write_inner(const void* data, int len)
 	}
 }
 
-void connection::handle_write(int error)
+void connection::handle_write(int32_t error)
 {
 	if (error)
 	{

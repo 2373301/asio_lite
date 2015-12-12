@@ -15,7 +15,7 @@ deadline_timer::~deadline_timer()
     cancel();
 }
 
-unsigned int deadline_timer::cancel()
+uint32_t deadline_timer::cancel()
 {
     return io_service_.cancel_timer(*this);
 }

@@ -4,7 +4,7 @@
 #include <x/io_service.h>
 #include <x/deadline_timer.h>
 
-int str_char(char* str, int len, char c);
+int32_t str_char(char* str, int32_t len, char c);
 
 class session
 {
@@ -27,12 +27,12 @@ public:
 			std::bind(&session::handle_write, this, std::placeholders::_1));
 	}
 
-	void handle_read(int error, size_t bytes_transferred)
+	void handle_read(int32_t error, size_t bytes_transferred)
 	{
 		if (!error)
 		{
 			len_ += bytes_transferred;
-			int end_pos = str_char(data_, len_, '\n');
+			int32_t end_pos = str_char(data_, len_, '\n');
 			if (end_pos != -1 || len_ >= max_length)
 			{
 				socket_.async_write(data_, len_,
@@ -52,7 +52,7 @@ public:
 		}
 	}
 
-	void handle_write(int error)
+	void handle_write(int32_t error)
 	{
 		len_ = 0;
 		if (!error)
@@ -71,7 +71,7 @@ private:
 	x::socket socket_;
 	enum { max_length = 1024 };
 	char data_[max_length];
-	int len_;
+	int32_t len_;
 };
 
 class server
@@ -90,7 +90,7 @@ public:
 			std::placeholders::_1));
 	}
 
-	void handle_accept(session* new_session, int error)
+	void handle_accept(session* new_session, int32_t error)
 	{
 		if (!error)
 		{
@@ -111,12 +111,12 @@ private:
 	x::socket acceptor_;
 };
 
-int main()
+int32_t main()
 {
 	x::io_service io_service;
 	server s(io_service, 8000);
 
-	const int THREAD_NUM = 5;
+	const int32_t THREAD_NUM = 5;
 	std::thread threads[THREAD_NUM];
 	for (std::size_t i = 0; i < THREAD_NUM; ++i)
 	{   
@@ -131,9 +131,9 @@ int main()
 	return 0;
 }
 
-int str_char(char* str, int len, char c)
+int32_t str_char(char* str, int32_t len, char c)
 {
-	for (int i=0; i<len; ++i)
+	for (int32_t i=0; i<len; ++i)
 	{
 		if (str[i] == c)
 			return i;

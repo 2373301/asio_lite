@@ -13,18 +13,18 @@ acceptor::~acceptor(void)
 {
 }
 
-int acceptor::start(unsigned short port, net_callback* callback)
+int32_t acceptor::start(unsigned short port, net_callback* callback)
 {
-	int ret = socket_.open();
+	int32_t ret = socket_.open();
 	if (ret != 0)
 	{
 		return ret;
 	}
 
-	int reuse_addr = 1;
+	int32_t reuse_addr = 1;
 	socket_.set_option(SOL_SOCKET, SO_REUSEADDR, (char*)&reuse_addr, sizeof(reuse_addr));
 
-	int nodelay = 1;
+	int32_t nodelay = 1;
 	socket_.set_option(IPPROTO_TCP, TCP_NODELAY, (char*)&reuse_addr, sizeof(reuse_addr));
 
 	ret = socket_.bind(port);
@@ -60,7 +60,7 @@ void acceptor::start_accept()
         shared_from_this(), new_conn, std::placeholders::_1));
 }
 
-void acceptor::handle_accept(connection_ptr new_conn, int error)
+void acceptor::handle_accept(connection_ptr new_conn, int32_t error)
 {
 	if (!error)
 	{

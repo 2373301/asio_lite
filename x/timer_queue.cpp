@@ -13,7 +13,7 @@ timer_queue::~timer_queue()
 {
 }
 
-bool timer_queue::enqueue_timer(long long time, per_timer_data& timer, io_operation* op)
+bool timer_queue::enqueue_timer(int64_t time, per_timer_data& timer, io_operation* op)
 {
 	// Enqueue the timer object.
 	if (timer.prev_ == 0 && &timer != timers_)
@@ -50,9 +50,9 @@ bool timer_queue::empty() const
 	return timers_ == 0;
 }
 
-unsigned int timer_queue::cancel_timer(per_timer_data& timer, op_queue<io_operation>& ops)
+uint32_t timer_queue::cancel_timer(per_timer_data& timer, op_queue<io_operation>& ops)
 {
-	unsigned int num_cancelled = 0;
+	uint32_t num_cancelled = 0;
 	if (timer.prev_ != 0 || &timer == timers_)
 	{
 		timer.op_->error_ = -1;
@@ -64,18 +64,18 @@ unsigned int timer_queue::cancel_timer(per_timer_data& timer, op_queue<io_operat
 	return num_cancelled;
 }
 
-long timer_queue::wait_duration_msec(long max_duration) const
+int32_t timer_queue::wait_duration_msec(int32_t max_duration) const
 {
 	if (heap_.empty())
 		return max_duration;
 
-	return long(heap_[0].time - io_service::get_time());
+	return int32_t(heap_[0].time - io_service::get_milli_secs());
 }
 
 void timer_queue::remove_timer(per_timer_data& timer)
 {
 	// Remove the timer from the heap.
-	unsigned int index = timer.heap_index_;
+	uint32_t index = timer.heap_index_;
 	if (!heap_.empty() && index < heap_.size())
 	{
 		if (index == heap_.size() - 1)
@@ -86,7 +86,7 @@ void timer_queue::remove_timer(per_timer_data& timer)
 		{
 			swap_heap(index, heap_.size() - 1);
 			heap_.pop_back();
-			unsigned int parent = (index - 1) / 2;
+			uint32_t parent = (index - 1) / 2;
 			if (index > 0 && heap_[index].time < heap_[parent].time)
 				up_heap(index);
 			else
@@ -109,7 +109,7 @@ void timer_queue::get_ready_timers(op_queue<io_operation>& ops)
 {
 	if (!heap_.empty())
 	{
-		long long now = io_service::get_time();
+		int64_t now = io_service::get_milli_secs();
 		while (!heap_.empty() && now >= heap_[0].time)
 		{
 			per_timer_data* timer = heap_[0].timer;
@@ -135,14 +135,14 @@ void timer_queue::get_all_timers(op_queue<io_operation>& ops)
 	heap_.clear();
 }
 
-unsigned int timer_queue::get_size()
+uint32_t timer_queue::get_size()
 {
 	return heap_.size();
 }
 
-void timer_queue::up_heap(unsigned int index)
+void timer_queue::up_heap(uint32_t index)
 {
-	unsigned int parent = (index - 1) / 2;
+	uint32_t parent = (index - 1) / 2;
 	while (index > 0
 		&& heap_[index].time < heap_[parent].time)
 	{
@@ -152,12 +152,12 @@ void timer_queue::up_heap(unsigned int index)
 	}
 }
 
-void timer_queue::down_heap(unsigned int index)
+void timer_queue::down_heap(uint32_t index)
 {
-	unsigned int child = index * 2 + 1;
+	uint32_t child = index * 2 + 1;
 	while (child < heap_.size())
 	{
-		unsigned int min_child = (child + 1 == heap_.size()
+		uint32_t min_child = (child + 1 == heap_.size()
 			|| heap_[child].time < heap_[child + 1].time)
 			? child : child + 1;
 		if (heap_[index].time < heap_[min_child].time)
@@ -168,7 +168,7 @@ void timer_queue::down_heap(unsigned int index)
 	}
 }
 
-void timer_queue::swap_heap(unsigned int index1, unsigned int index2)
+void timer_queue::swap_heap(uint32_t index1, uint32_t index2)
 {
 	heap_entry tmp = heap_[index1];
 	heap_[index1] = heap_[index2];

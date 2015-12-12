@@ -25,12 +25,12 @@ protected:
 	virtual void init(net_callback* callback, unsigned thread_num = 3);
 	virtual void release();
 
-	virtual int start_server(unsigned short port);
+	virtual int32_t start_server(unsigned short port);
 	virtual void stop_server();
 
 	virtual unsigned connect(const char* ipaddr, unsigned short port, 
-		int timeout_millis, unsigned short local_port = 0);
-	virtual int send_data(unsigned id, const void* data, int len);
+		int32_t timeout_millis, unsigned short local_port = 0);
+	virtual int32_t send_data(unsigned id, const void* data, int32_t len);
 	virtual void close(unsigned id);
 	virtual unsigned getids()
 	{

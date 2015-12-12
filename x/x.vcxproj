@@ -13,7 +13,6 @@
   <ItemGroup>
     <ClInclude Include="binder.h" />
     <ClInclude Include="deadline_timer.h" />
-    <ClInclude Include="info.h" />
     <ClInclude Include="io_operation.h" />
     <ClInclude Include="io_service.h" />
     <ClInclude Include="noncopyable.h" />

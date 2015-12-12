@@ -16,7 +16,7 @@ socket::~socket()
 	close();
 }
 
-int socket::set_option(int level, int optname, const char* optvalue, int optlen)
+int32_t socket::set_option(int32_t level, int32_t optname, const char* optvalue, int32_t optlen)
 {
 	if (::setsockopt(socket_, level, optname, optvalue, optlen) != NO_ERROR)
 	{
@@ -25,7 +25,7 @@ int socket::set_option(int level, int optname, const char* optvalue, int optlen)
 	return 0;
 }
 
-int socket::get_option(int level, int optname, char* optvalue, int* optlen)
+int32_t socket::get_option(int32_t level, int32_t optname, char* optvalue, int32_t* optlen)
 {
 	if (::getsockopt(socket_, level, optname, optvalue, optlen) != NO_ERROR)
 	{
@@ -34,7 +34,7 @@ int socket::get_option(int level, int optname, char* optvalue, int* optlen)
 	return 0;
 }
 
-int socket::open(int type, int protocol)
+int32_t socket::open(int32_t type, int32_t protocol)
 {
 	::SetLastError(0);
 	socket_ = ::WSASocket(AF_INET, type, protocol, NULL, 0, WSA_FLAG_OVERLAPPED);
@@ -46,7 +46,7 @@ int socket::open(int type, int protocol)
 	return 0;
 }
 
-int socket::close()
+int32_t socket::close()
 {
 	if (socket_ != INVALID_SOCKET)
 	{
@@ -57,7 +57,7 @@ int socket::close()
 	return 0;
 }
 
-int socket::bind(unsigned short port, const char* ipaddr)
+int32_t socket::bind(unsigned short port, const char* ipaddr)
 {
 	sockaddr_in saddri;
 	::memset(&saddri, 0, sizeof(saddri));
@@ -88,7 +88,7 @@ int socket::bind(unsigned short port, const char* ipaddr)
 	return 0;
 }
 
-int socket::listen(int backlog)
+int32_t socket::listen(int32_t backlog)
 {
 	::SetLastError(0);
 	if (::listen(socket_, backlog) == SOCKET_ERROR)
@@ -98,7 +98,7 @@ int socket::listen(int backlog)
 	return 0;
 }
 
-void socket::set_remote_addr(LPSOCKADDR remote_addr, int remote_addr_length)
+void socket::set_remote_addr(LPSOCKADDR remote_addr, int32_t remote_addr_length)
 {
 	if (sizeof(remote_addr_) > remote_addr_length)
 	{
